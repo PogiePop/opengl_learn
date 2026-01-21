@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 3.15)
+
+project(learnopengl)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(MSVC)
+add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:/utf-8>")
+endif()
+
+#若没有glm,自行安装
+set(GLM_SRC C:\\glm-0.9.8.5\\glm)
+set(GLFW_SRC C:\\glfw-3.4.bin.WIN64\\glfw-3.4.bin.WIN64\\)
+set(GLFW_INCLUDE ${GLFW_SRC}/include)
+set(GLFW_LIB ${GLFW_SRC}/lib-vc2022)
+set(GLAD_ROOT C:\\glad)
+
+link_directories(${GLFW_LIB})
+include_directories(${GLFW_INCLUDE})
+include_directories(${GLM_SRC})
+include_directories(${GLAD_ROOT}/include)
+#添加tools
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tools)
+
+
+#将glad链接进COMMON_LIBS
+add_library(glad STATIC
+    ${GLAD_ROOT}/src/glad.c
+)
+
+#将stbi_image链接进COMMON_LIBS
+add_library(stbi STATIC
+    tools/stb_image.cpp
+)
+
+#添加glfw.lib,以及windows上必须的opengl32.lib
+set(COMMON_LIBS glfw3 opengl32 glad stbi) 
+
+enable_testing()
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+
