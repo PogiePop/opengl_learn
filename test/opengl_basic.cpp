@@ -98,7 +98,7 @@ int main()
     Shader tri(RES_PATH "shaders/tri.vert", nullptr, RES_PATH "shaders/tri.frag");
    
     Texture t1(RES_PATH "textures/wo1.png", nullptr);
-    
+    Texture t2(RES_PATH "textures/l1.png", nullptr);
     
     _window.Run([&](GLFWwindow* window){
         camera.ProcessInput(window, Time::instance->deltatime);
@@ -112,7 +112,13 @@ int main()
         tri.SetMat4("model", model);
         tri.SetMat4("view", view);
         tri.SetMat4("projection", projection);
+        tri.SetInt1("texture0", 0);
+        tri.SetInt1("texture1", 1);
+        glActiveTexture(GL_TEXTURE0);
         t1.Bind();
+        glActiveTexture(GL_TEXTURE1);
+        t2.Bind();
+        glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0);
     });

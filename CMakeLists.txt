@@ -15,6 +15,7 @@ set(GLFW_SRC C:\\glfw-3.4.bin.WIN64\\glfw-3.4.bin.WIN64\\)
 set(GLFW_INCLUDE ${GLFW_SRC}/include)
 set(GLFW_LIB ${GLFW_SRC}/lib-vc2022)
 set(GLAD_ROOT C:\\glad)
+set(IMGUI_SRC C:\\IMGUI)
 
 link_directories(${GLFW_LIB})
 include_directories(${GLFW_INCLUDE})
@@ -22,6 +23,8 @@ include_directories(${GLM_SRC})
 include_directories(${GLAD_ROOT}/include)
 #添加tools
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tools)
+
+include_directories(${IMGUI_SRC})
 
 
 #将glad链接进COMMON_LIBS
@@ -34,8 +37,20 @@ add_library(stbi STATIC
     tools/stb_image.cpp
 )
 
+#添加imgui
+add_library(imgui
+    STATIC
+    ${IMGUI_SRC}/imgui.cpp
+    ${IMGUI_SRC}/imgui_demo.cpp
+    ${IMGUI_SRC}/imgui_draw.cpp
+    ${IMGUI_SRC}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_SRC}/backends/imgui_impl_opengl3.cpp
+    ${IMGUI_SRC}/imgui_tables.cpp
+    ${IMGUI_SRC}/imgui_widgets.cpp
+)
+
 #添加glfw.lib,以及windows上必须的opengl32.lib
-set(COMMON_LIBS glfw3 opengl32 glad stbi) 
+set(COMMON_LIBS glfw3 opengl32 glad stbi imgui) 
 
 enable_testing()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
