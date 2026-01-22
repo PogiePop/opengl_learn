@@ -5,7 +5,11 @@
 #include <time.hpp>
 #include <functional>
 #include <memory>
+#include <print>
 #include <string>
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 static const int DEFAULT_WIDTH = 800;
 static const int DEFAULT_HEIGHT = 600;
 auto glfwWindowDeleter = [](GLFWwindow *window) -> auto
@@ -83,8 +87,21 @@ inline void Window::Init(int width, int height, const std::string &title)
     // 设置用户数据
     glfwSetWindowUserPointer(m_Window.get(), this);
 
+    //初始化imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsLight();
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(400, 300);
+    io.Fonts->AddFontDefault();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
+    ImGui_ImplGlfw_InitForOpenGL(m_Window.get(), true);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
+
     // 开始计时
     Time::instance = std::make_unique<Time>();
+
 }
 
 inline void Window::Run(WindowEventCallback callback)
@@ -129,6 +146,8 @@ inline void Window::SetEventProxy()
     });
 
     glfwSetCursorPosCallback(m_Window.get(), [](GLFWwindow* window, double xPos, double yPos){
+        ImGuiIO& io = ImGui::GetIO();
+        if(io.WantCaptureMouse)return;
          //获取窗口数据
         Window* self = (Window*)glfwGetWindowUserPointer(window);
         if(self && self->m_CursorCall && self->isMouseLeft)
@@ -159,6 +178,8 @@ inline void Window::SetEventProxy()
     });
 
     glfwSetMouseButtonCallback(m_Window.get(), [](GLFWwindow* window, int button, int action, int mods){
+        ImGuiIO& io = ImGui::GetIO();
+        if(io.WantCaptureMouse)return;
         //获取窗口数据
         Window* self = (Window*)glfwGetWindowUserPointer(window);
         if(self)

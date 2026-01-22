@@ -5,7 +5,7 @@
 
 constexpr float DEFAULT_SENSITIVITY = 0.1f;
 constexpr float DEFAULT_PCH = 0.0f;
-constexpr float DEFAULT_YAW = 0.0f;
+constexpr float DEFAULT_YAW = -90.0f;
 constexpr float DEFAULT_ZOOM = 45.0f;
 constexpr float DEFAULT_SPEED = 2.5f;
 

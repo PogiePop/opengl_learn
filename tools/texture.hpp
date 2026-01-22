@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include "stb_image.h"
 #include <string>
+#include <print>
+#include <vector>
 #include <Windows.h>
 
 class Texture
