@@ -1,6 +1,7 @@
 #ifndef _WA_CAMERA_HPP
 #define _WA_CAMERA_HPP
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
 constexpr float DEFAULT_SENSITIVITY = 0.1f;

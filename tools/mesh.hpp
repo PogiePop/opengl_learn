@@ -10,6 +10,7 @@ struct Vertex
     glm::vec3 position;
     glm::vec2 texCoord;
     glm::vec3 normal;
+    Vertex(){}
     Vertex(glm::vec3 position, glm::vec2 texCoord, glm::vec3 normal): 
     position(position), texCoord(texCoord), normal(normal){}
 };
@@ -39,9 +40,9 @@ inline void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<un
     glGenBuffers(1, &ebo);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, (int)vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (int)vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)indices.size(), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(1);
@@ -63,19 +64,20 @@ inline void Mesh::Draw(Shader &sd)
         }
         else if(textures[i].type == "specular")
         {
-            name += "material.specualr" + std::to_string(specNum++);
+            name += "material.specular" + std::to_string(specNum++);
         }
         else
         {
             name += "material.other" + std::to_string(other++);
         }
+        //std::println("texture name:{},", name);
         glActiveTexture(GL_TEXTURE0 + i);
         textures[i].Bind();
         sd.SetInt1(name, i);
     }
     glActiveTexture(GL_TEXTURE0);
     Bind();
-    glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, (int)indices.size() * sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
 

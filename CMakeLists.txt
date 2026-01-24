@@ -16,8 +16,15 @@ set(GLFW_INCLUDE ${GLFW_SRC}/include)
 set(GLFW_LIB ${GLFW_SRC}/lib-vc2022)
 set(GLAD_ROOT C:\\glad)
 set(IMGUI_SRC C:\\IMGUI)
+#assimp库
+set(ASSIMP_SRC C:\\assimp\\6.0.2\\assimp)
+set(ASSIMP_DLL ${ASSIMP_SRC}/build/bin/Debug/assimp-vc143-mtd.dll)
+set(ASSIMP_LIB ${ASSIMP_SRC}/build/lib/Debug)
+set(ASSIMP_CONFIG ${ASSIMP_SRC}/build/include)
+set(ASSIMP_INCLUDE ${ASSIMP_SRC}/include)
 
 link_directories(${GLFW_LIB})
+link_directories(${ASSIMP_LIB})
 include_directories(${GLFW_INCLUDE})
 include_directories(${GLM_SRC})
 include_directories(${GLAD_ROOT}/include)
@@ -25,6 +32,8 @@ include_directories(${GLAD_ROOT}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 include_directories(${IMGUI_SRC})
+include_directories(${ASSIMP_CONFIG})
+include_directories(${ASSIMP_INCLUDE})
 
 
 #将glad链接进COMMON_LIBS
@@ -50,8 +59,12 @@ add_library(imgui
 )
 
 #添加glfw.lib,以及windows上必须的opengl32.lib
-set(COMMON_LIBS glfw3 opengl32 glad stbi imgui) 
+set(COMMON_LIBS glfw3 opengl32 glad stbi imgui assimp-vc143-mtd) 
 
 enable_testing()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+
+
+
+
 
