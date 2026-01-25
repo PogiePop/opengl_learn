@@ -14,6 +14,15 @@ add_test(model model)
 target_link_libraries(model PUBLIC ${COMMON_LIBS})
 
 
+add_executable(depth opengl_depthtest.cpp)
+add_test(depth depth)
+target_link_libraries(depth PUBLIC ${COMMON_LIBS})
+
+add_executable(stencil opengl_stenciltest.cpp)
+add_test(stencil stencil)
+target_link_libraries(stencil PUBLIC ${COMMON_LIBS})
+
+
 
 #将assimp dll复制到执行文件下的目录
 add_custom_command(TARGET model POST_BUILD
