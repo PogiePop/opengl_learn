@@ -12,6 +12,7 @@
 #include <backends/imgui_impl_opengl3.h>
 static const int DEFAULT_WIDTH = 800;
 static const int DEFAULT_HEIGHT = 600;
+#define TTF_PATH "../../res/fonts/"
 auto glfwWindowDeleter = [](GLFWwindow *window) -> auto
 {
     if (window)
@@ -96,6 +97,20 @@ inline void Window::Init(int width, int height, const std::string &title)
     io.Fonts->AddFontDefault();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
+
+    //加载中文字体
+    ImFontConfig font_config;
+    font_config.MergeMode = true; //合并到默认字体
+    font_config.PixelSnapH = true;
+    //设置字体大小
+    float font_size = 16.0f;
+    //加载
+    io.Fonts->AddFontFromFileTTF(
+        TTF_PATH "FZSTK.TTF",
+        font_size,
+        &font_config,
+        io.Fonts->GetGlyphRangesChineseFull() //加载完整字形
+    );
     ImGui_ImplGlfw_InitForOpenGL(m_Window.get(), true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 

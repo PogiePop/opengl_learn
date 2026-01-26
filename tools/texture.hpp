@@ -10,7 +10,7 @@
 class Texture
 {
 public:
-Texture(const char* path, const char* type = nullptr);
+Texture(const char* path, const char* type = nullptr, bool isFlipUV = false);
 void Bind(){ glBindTexture(GL_TEXTURE_2D, ID); } 
 unsigned int GetID(){ return ID; }
 public:
@@ -19,15 +19,15 @@ std::string type;
 private:
 unsigned int ID = 0;
 private:
-inline void Init(const char* path);
+inline void Init(const char* path, bool isFlipUV = false);
 };
 
-Texture::Texture(const char* path, const char* type)
+Texture::Texture(const char* path, const char* type, bool isFlipUV)
 {
     if(path)
     {
         this->path = path;
-        Init(path);
+        Init(path, isFlipUV);
     }
     if(type)
         this->type = type;
@@ -109,8 +109,9 @@ std::vector<unsigned char> readFileToMemory(const std::wstring& wpath)
 }
 
 
-inline void Texture::Init(const char* path)
+inline void Texture::Init(const char* path, bool isFlipUV)
 {
+    stbi_set_flip_vertically_on_load(isFlipUV);
     int width, height, nrChannel;
     //读取文件
     try{

@@ -22,6 +22,14 @@ add_executable(stencil opengl_stenciltest.cpp)
 add_test(stencil stencil)
 target_link_libraries(stencil PUBLIC ${COMMON_LIBS})
 
+add_executable(blend opengl_blend.cpp)
+add_test(blend blend)
+target_link_libraries(blend PUBLIC ${COMMON_LIBS})
+
+add_executable(cullface opengl_cullface.cpp)
+add_test(cullface cullface)
+target_link_libraries(cullface PUBLIC ${COMMON_LIBS})
+
 
 
 #将assimp dll复制到执行文件下的目录
