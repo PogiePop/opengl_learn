@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            // 关键修改：先设置控制台编码为GBK(936)，再执行cmake构建
+            "command": "chcp 936 && cmake --build ${workspaceFolder}/build --config Debug --target ALL_BUILD -j 16",
+            "args": [], // 原参数整合到command里，无需单独写
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

@@ -23,7 +23,11 @@ public:
         const std::vector<Texture> &textures): 
     vertices(vertices), indices(indices), textures(textures){ Init(vertices, indices); }
     inline void Draw(Shader &);
-    void Bind(){ glBindVertexArray(vao); }    
+    inline void DrawCubeMap(Shader &);
+    void Bind(){ glBindVertexArray(vao); }
+    void AddTexture(const std::vector<Texture>& textures){ this->textures.insert(this->textures.end(), textures.begin(), textures.end()); }    
+    void AddTexture(const Texture& tex){ this->textures.push_back(tex); }
+    void ClearTextures(){ this->textures.clear(); }
 private:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
@@ -74,6 +78,21 @@ inline void Mesh::Draw(Shader &sd)
         glActiveTexture(GL_TEXTURE0 + i);
         textures[i].Bind();
         sd.SetInt1(name, i);
+    }
+    glActiveTexture(GL_TEXTURE0);
+    Bind();
+    glDrawElements(GL_TRIANGLES, (int)indices.size() * sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+}
+
+inline void Mesh::DrawCubeMap(Shader & sd)
+{
+    for(int i = 0; i < (int)textures.size(); i++)
+    {
+        std::string name = "material.diffuse";
+        glActiveTexture(GL_TEXTURE0 + i);
+        textures[i].BindCubeMap();
+        sd.SetInt1(name + std::to_string(i), i);
     }
     glActiveTexture(GL_TEXTURE0);
     Bind();

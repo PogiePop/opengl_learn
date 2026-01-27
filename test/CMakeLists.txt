@@ -30,6 +30,14 @@ add_executable(cullface opengl_cullface.cpp)
 add_test(cullface cullface)
 target_link_libraries(cullface PUBLIC ${COMMON_LIBS})
 
+add_executable(framebuffer opengl_framebuffer.cpp)
+add_test(framebuffer framebuffer)
+target_link_libraries(framebuffer PUBLIC ${COMMON_LIBS})
+
+add_executable(skybox opengl_skybox.cpp)
+add_test(skybox skybox)
+target_link_libraries(skybox PUBLIC ${COMMON_LIBS})
+
 
 
 #将assimp dll复制到执行文件下的目录

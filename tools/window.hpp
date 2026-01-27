@@ -44,7 +44,7 @@ private:
     WindowSizeCallback m_SizeCall;
     CursorPosCallback m_CursorCall;
     ScrollPosCallback m_ScrollCall;
-    int m_Width, m_Height;
+    int m_Width = 800, m_Height = 600;
     bool firstMouse = true, isMouseLeft = false;
     float lastX = 0.0f, lastY = 0.0f;
 };
