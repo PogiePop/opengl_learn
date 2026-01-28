@@ -4,10 +4,13 @@
 
 const static std::vector<Texture> _empty = std::vector<Texture>();
 
-Mesh CreateCubeMesh(float, const std::vector<Texture> &);
-Mesh CreateQuadMesh(float, const std::vector<Texture> &);
+Mesh CreateCubeMesh(float, const std::vector<Texture> &, bool);
+Mesh CreateQuadMesh(float, const std::vector<Texture> &, bool);
+Mesh CreatePointMesh(const std::vector<glm::vec3>& points, 
+                     float pointSize = 5.0f,  // 点的大小（渲染时用glPointSize设置）
+                     const std::vector<Texture>& textures = _empty);
 
-Mesh CreateCubeMesh(float size = 1.0f, const std::vector<Texture> &textures = _empty)
+Mesh CreateCubeMesh(float size = 1.0f, const std::vector<Texture> &textures = _empty, bool isSubMod = false)
 {
     // 计算半长（立方体中心在原点，各轴范围 [-halfSize, halfSize]）
     float halfSize = size / 2.0f;
@@ -68,10 +71,10 @@ Mesh CreateCubeMesh(float size = 1.0f, const std::vector<Texture> &textures = _e
     };
 
     // 创建并返回Mesh对象
-    return Mesh(cubeVertices, cubeIndices, textures);
+    return Mesh(cubeVertices, cubeIndices, textures, isSubMod);
 }
 
-Mesh CreateQuadMesh(float size = 1.0f, const std::vector<Texture> &textures = _empty)
+Mesh CreateQuadMesh(float size = 1.0f, const std::vector<Texture> &textures = _empty, bool isSubMod = false)
 {
     // 半长：四边形沿X/Y轴的半尺寸，中心在(0,0,0)，平面Z=0
     float halfSize = size / 2.0f;
@@ -94,7 +97,34 @@ Mesh CreateQuadMesh(float size = 1.0f, const std::vector<Texture> &textures = _e
         0, 2, 3};
 
     // 直接返回Mesh对象，复用现有Mesh类的VAO/VBO/EBO初始化逻辑
-    return Mesh(quadVertices, quadIndices, textures);
+    return Mesh(quadVertices, quadIndices, textures, isSubMod);
+}
+
+
+Mesh CreatePointMesh(const std::vector<glm::vec3>& points, 
+                     float pointSize, 
+                     const std::vector<Texture>& textures) {
+    // 转换点位置为Vertex结构体（纹理坐标/法线设为默认值，点渲染无需这些）
+    std::vector<Vertex> pointVertices;
+    for (const auto& pos : points) {
+        // Vertex参数：position(点位置) + texCoord(默认0,0) + normal(默认0,0,0)
+        pointVertices.emplace_back(pos, glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    }
+
+    // 点渲染无需索引（EBO），传空向量
+    std::vector<unsigned int> emptyIndices;
+
+    // 创建Mesh对象（Init方法兼容空索引，仅创建VAO/VBO，不创建EBO）
+    Mesh pointMesh(pointVertices, emptyIndices, textures);
+    
+    // 注意：pointSize只是参数存储，实际渲染时需调用glPointSize(pointSize)
+    return pointMesh;
+}
+
+Mesh CreatePointMesh(const glm::vec3& singlePoint, 
+                     float pointSize = 5.0f, 
+                     const std::vector<Texture>& textures = _empty) {
+    return CreatePointMesh(std::vector<glm::vec3>{singlePoint}, pointSize, textures);
 }
 
 #endif

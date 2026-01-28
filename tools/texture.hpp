@@ -10,6 +10,7 @@
 class Texture
 {
 public:
+    Texture() = default;
     Texture(const char *path, const char *type = nullptr, bool isFlipUV = false);
     Texture(unsigned int ID, const char *type)
     {

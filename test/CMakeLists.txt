@@ -38,6 +38,15 @@ add_executable(skybox opengl_skybox.cpp)
 add_test(skybox skybox)
 target_link_libraries(skybox PUBLIC ${COMMON_LIBS})
 
+add_executable(highdata opengl_highdata.cpp)
+add_test(highdata highdata)
+target_link_libraries(highdata PUBLIC ${COMMON_LIBS})
+
+
+add_executable(highglsl opengl_highglsl.cpp)
+add_test(highglsl highglsl)
+target_link_libraries(highglsl PUBLIC ${COMMON_LIBS})
+
 
 
 #将assimp dll复制到执行文件下的目录
