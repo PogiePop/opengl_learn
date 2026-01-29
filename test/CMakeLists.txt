@@ -47,6 +47,10 @@ add_executable(highglsl opengl_highglsl.cpp)
 add_test(highglsl highglsl)
 target_link_libraries(highglsl PUBLIC ${COMMON_LIBS})
 
+add_executable(geometry opengl_geometry.cpp)
+add_test(geometry geometry)
+target_link_libraries(geometry PUBLIC ${COMMON_LIBS})
+
 
 
 #将assimp dll复制到执行文件下的目录
