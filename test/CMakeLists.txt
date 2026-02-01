@@ -51,6 +51,14 @@ add_executable(geometry opengl_geometry.cpp)
 add_test(geometry geometry)
 target_link_libraries(geometry PUBLIC ${COMMON_LIBS})
 
+add_executable(instance opengl_instance.cpp)
+add_test(instance instance)
+target_link_libraries(instance PUBLIC ${COMMON_LIBS})
+
+
+add_executable(mutisample opengl_mutisample.cpp)
+add_test(mutisample mutisample)
+target_link_libraries(mutisample PUBLIC ${COMMON_LIBS})
 
 
 #将assimp dll复制到执行文件下的目录

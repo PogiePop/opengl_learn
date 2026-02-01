@@ -9,8 +9,16 @@
 class Model
 {
 public:
-Model(const std::string& path){ Init(path); }
+Model(const std::string& path, const std::vector<InstanceData>& instances = _instance_ep){ Init(path);
+    if(!instances.empty())
+    {
+        std::vector<glm::vec3> offsets;
+        for(const auto& elem : instances)offsets.push_back(elem.offset);
+        for(auto& mesh : meshes)mesh.ModifyOffset(offsets);
+    }
+}
 inline void Draw(Shader& sd);
+inline void DrawInstance(Shader& sd);
 private:
 std::vector<Mesh>meshes;
 std::string directory;
@@ -131,6 +139,11 @@ inline void Model::Draw(Shader& sd)
 {
     for(int i = 0; i < (int)meshes.size(); i++)
         meshes[i].Draw(sd);
+}
+
+inline void Model::DrawInstance(Shader& sd)
+{
+    for(auto& mesh : meshes)mesh.DrawInstance(sd, mesh.GetInstanceNum());
 }
 
 #endif

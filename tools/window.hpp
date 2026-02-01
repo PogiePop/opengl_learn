@@ -1,7 +1,12 @@
 #ifndef _WA_WINDOW_HPP
 #define _WA_WINDOW_HPP
+#define GLAD_API_CALL_EXPORT
+#define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#ifdef APIENTRY
+#undef APIENTRY
+#endif
 #include <time.hpp>
 #include <functional>
 #include <memory>
@@ -31,10 +36,12 @@ public:
     using CursorPosCallback = std::function<void(GLFWwindow *, float, float)>;
     using ScrollPosCallback = std::function<void(GLFWwindow *, float)>;
     using WindowEventCallback = std::function<void(GLFWwindow *)>;
+    using WindowInitCallback = std::function<void()>;
     inline void Run(WindowEventCallback callback);
     inline void SetEventCallback(WindowSizeCallback callback);
     inline void SetEventCallback(CursorPosCallback callback);
     inline void SetEventCallback(ScrollPosCallback callback);
+    inline static void SetInitCallback(WindowInitCallback callback);
     inline void SetEventProxy();
     int GetWidth(){ return m_Width; }
     int GetHeight(){ return m_Height; }
@@ -44,6 +51,7 @@ private:
     WindowSizeCallback m_SizeCall;
     CursorPosCallback m_CursorCall;
     ScrollPosCallback m_ScrollCall;
+    static WindowInitCallback initCall;
     int m_Width = 800, m_Height = 600;
     bool firstMouse = true, isMouseLeft = false;
     float lastX = 0.0f, lastY = 0.0f;
@@ -51,8 +59,10 @@ private:
 
 Window::~Window()
 {
-    if (!m_Window || !m_Window.get())
-        glfwDestroyWindow(m_Window.get());
+     // 必须清理ImGui资源，否则会内存泄漏
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 inline void Window::Init(int width, int height, const std::string &title)
@@ -61,6 +71,9 @@ inline void Window::Init(int width, int height, const std::string &title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if(initCall)initCall();
+    //初始化完成后，重置initCall
+    initCall = nullptr;
     m_Window = GLFWwindowPtr(glfwCreateWindow(width, height, title.c_str(), NULL, NULL), glfwWindowDeleter);
     if (!m_Window.get())
     {
@@ -208,6 +221,13 @@ inline void Window::SetEventProxy()
         }    
     });
 
+}
+
+Window::WindowInitCallback Window::initCall;
+
+inline void Window::SetInitCallback(WindowInitCallback callback)
+{
+    if(callback)initCall = callback;
 }
 
 #endif
