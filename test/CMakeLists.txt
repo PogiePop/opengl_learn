@@ -60,6 +60,22 @@ add_executable(mutisample opengl_mutisample.cpp)
 add_test(mutisample mutisample)
 target_link_libraries(mutisample PUBLIC ${COMMON_LIBS})
 
+add_executable(blinn opengl_blinn.cpp)
+add_test(blinn blinn)
+target_link_libraries(blinn PUBLIC ${COMMON_LIBS})
+
+add_executable(gamma opengl_gamma.cpp)
+add_test(gamma gamma)
+target_link_libraries(gamma PUBLIC ${COMMON_LIBS})
+
+add_executable(shadow opengl_shadow.cpp)
+add_test(shadow shadow)
+target_link_libraries(shadow PUBLIC ${COMMON_LIBS})
+
+add_executable(shadow1 opengl_shadow1.cpp)
+add_test(shadow1 shadow1)
+target_link_libraries(shadow1 PUBLIC ${COMMON_LIBS})
+
 
 #将assimp dll复制到执行文件下的目录
 add_custom_command(TARGET model POST_BUILD

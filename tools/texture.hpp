@@ -11,7 +11,7 @@ class Texture
 {
 public:
     Texture() = default;
-    Texture(const char *path, const char *type = nullptr, bool isFlipUV = false);
+    Texture(const char *path, const char *type = nullptr, bool isFlipUV = false, bool isSRGB = false);
     Texture(unsigned int ID, const char *type)
     {
         this->ID = ID;
@@ -30,16 +30,16 @@ private:
     unsigned int ID = 0;
 
 private:
-    inline void Init(const char *path, bool isFlipUV = false);
+    inline void Init(const char *path, bool isFlipUV = false, bool isSRGB = false);
     inline void LoadCubeMap(const std::vector<std::string> &);
 };
 
-Texture::Texture(const char *path, const char *type, bool isFlipUV)
+Texture::Texture(const char *path, const char *type, bool isFlipUV, bool isSRGB)
 {
     if (path)
     {
         this->path = path;
-        Init(path, isFlipUV);
+        Init(path, isFlipUV, isSRGB);
     }
     if (type)
         this->type = type;
@@ -119,7 +119,7 @@ std::vector<unsigned char> readFileToMemory(const std::wstring &wpath)
     return buffer;
 }
 
-inline void Texture::Init(const char *path, bool isFlipUV)
+inline void Texture::Init(const char *path, bool isFlipUV, bool isSRGB)
 {
     stbi_set_flip_vertically_on_load(isFlipUV);
     int width, height, nrChannel;
@@ -143,12 +143,12 @@ inline void Texture::Init(const char *path, bool isFlipUV)
         else if (nrChannel == 3)
         {
             format = GL_RGB;
-            internalformat = GL_RGB;
+            internalformat = isSRGB ? GL_SRGB : GL_RGB;
         }
         else if (nrChannel == 4)
         {
             format = GL_RGBA;
-            internalformat = GL_RGBA;
+            internalformat = isSRGB ? GL_SRGB_ALPHA : GL_RGBA;
         }
         else
         {

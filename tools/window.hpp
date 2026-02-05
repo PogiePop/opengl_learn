@@ -43,8 +43,9 @@ public:
     inline void SetEventCallback(ScrollPosCallback callback);
     inline static void SetInitCallback(WindowInitCallback callback);
     inline void SetEventProxy();
-    int GetWidth(){ return m_Width; }
-    int GetHeight(){ return m_Height; }
+    int GetWidth() { return m_Width; }
+    int GetHeight() { return m_Height; }
+
 private:
     inline void Init(int width, int height, const std::string &title);
     GLFWwindowPtr m_Window;
@@ -59,7 +60,7 @@ private:
 
 Window::~Window()
 {
-     // 必须清理ImGui资源，否则会内存泄漏
+    // 必须清理ImGui资源，否则会内存泄漏
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -71,8 +72,9 @@ inline void Window::Init(int width, int height, const std::string &title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if(initCall)initCall();
-    //初始化完成后，重置initCall
+    if (initCall)
+        initCall();
+    // 初始化完成后，重置initCall
     initCall = nullptr;
     m_Window = GLFWwindowPtr(glfwCreateWindow(width, height, title.c_str(), NULL, NULL), glfwWindowDeleter);
     if (!m_Window.get())
@@ -92,7 +94,7 @@ inline void Window::Init(int width, int height, const std::string &title)
     }
     glViewport(0, 0, width, height);
 
-    //开启垂直同步
+    // 开启垂直同步
     glfwSwapInterval(1);
 
     // 设置回调函数
@@ -101,35 +103,36 @@ inline void Window::Init(int width, int height, const std::string &title)
     // 设置用户数据
     glfwSetWindowUserPointer(m_Window.get(), this);
 
-    //初始化imgui
+    // 初始化imgui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsLight();
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     io.DisplaySize = ImVec2(400, 300);
     io.Fonts->AddFontDefault();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
 
-    //加载中文字体
+    // 加载中文字体
     ImFontConfig font_config;
-    font_config.MergeMode = true; //合并到默认字体
+    font_config.MergeMode = true; // 合并到默认字体
     font_config.PixelSnapH = true;
-    //设置字体大小
+    // 设置字体大小
     float font_size = 16.0f;
-    //加载
+    // 加载
     io.Fonts->AddFontFromFileTTF(
         TTF_PATH "FZSTK.TTF",
         font_size,
         &font_config,
-        io.Fonts->GetGlyphRangesChineseFull() //加载完整字形
+        io.Fonts->GetGlyphRangesChineseFull() // 加载完整字形
     );
+
+
     ImGui_ImplGlfw_InitForOpenGL(m_Window.get(), true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
     // 开始计时
     Time::instance = std::make_unique<Time>();
-
 }
 
 inline void Window::Run(WindowEventCallback callback)
@@ -148,20 +151,24 @@ inline void Window::Run(WindowEventCallback callback)
 
 inline void Window::SetEventCallback(WindowSizeCallback callback)
 {
-    if(callback)m_SizeCall = callback;
+    if (callback)
+        m_SizeCall = callback;
 }
 inline void Window::SetEventCallback(CursorPosCallback callback)
 {
-    if(callback)m_CursorCall = callback;
+    if (callback)
+        m_CursorCall = callback;
 }
 inline void Window::SetEventCallback(ScrollPosCallback callback)
 {
-    if(callback)m_ScrollCall = callback;
+    if (callback)
+        m_ScrollCall = callback;
 }
 inline void Window::SetEventProxy()
 {
 
-    glfwSetFramebufferSizeCallback(m_Window.get(), [](GLFWwindow* window, int width, int height){
+    glfwSetFramebufferSizeCallback(m_Window.get(), [](GLFWwindow *window, int width, int height)
+                                   {
         //获取窗口数据
         Window* self = (Window*)glfwGetWindowUserPointer(window);
         if(self && self->m_SizeCall)
@@ -170,10 +177,10 @@ inline void Window::SetEventProxy()
             self->m_Height = height;
             self->m_SizeCall(window, width, height);
             //std::printf("window size: %dX%d\n", width, height);
-        }       
-    });
+        } });
 
-    glfwSetCursorPosCallback(m_Window.get(), [](GLFWwindow* window, double xPos, double yPos){
+    glfwSetCursorPosCallback(m_Window.get(), [](GLFWwindow *window, double xPos, double yPos)
+                             {
         ImGuiIO& io = ImGui::GetIO();
         if(io.WantCaptureMouse)return;
          //获取窗口数据
@@ -192,20 +199,20 @@ inline void Window::SetEventProxy()
             self->lastX = (float)xPos;
             self->lastY = (float)yPos; 
             self->m_CursorCall(window, xOffset, yOffset);
-        }       
-    });
+        } });
 
-    glfwSetScrollCallback(m_Window.get(), [](GLFWwindow* window, double xOffset, double yOffset){
+    glfwSetScrollCallback(m_Window.get(), [](GLFWwindow *window, double xOffset, double yOffset)
+                          {
         //获取窗口数据
         Window* self = (Window*)glfwGetWindowUserPointer(window);
         if(self && self->m_ScrollCall)
         {
             self->m_ScrollCall(window, (float)yOffset);
             //std::printf("window size: %dX%d\n", width, height);
-        }       
-    });
+        } });
 
-    glfwSetMouseButtonCallback(m_Window.get(), [](GLFWwindow* window, int button, int action, int mods){
+    glfwSetMouseButtonCallback(m_Window.get(), [](GLFWwindow *window, int button, int action, int mods)
+                               {
         ImGuiIO& io = ImGui::GetIO();
         if(io.WantCaptureMouse)return;
         //获取窗口数据
@@ -218,16 +225,15 @@ inline void Window::SetEventProxy()
                 self->isMouseLeft = false;
                 self->firstMouse = true;
             }
-        }    
-    });
-
+        } });
 }
 
 Window::WindowInitCallback Window::initCall;
 
 inline void Window::SetInitCallback(WindowInitCallback callback)
 {
-    if(callback)initCall = callback;
+    if (callback)
+        initCall = callback;
 }
 
 #endif

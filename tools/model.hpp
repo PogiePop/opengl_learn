@@ -9,7 +9,9 @@
 class Model
 {
 public:
-Model(const std::string& path, const std::vector<InstanceData>& instances = _instance_ep){ Init(path);
+Model(const std::string& path, const std::vector<InstanceData>& instances = _instance_ep, bool isSRGB = false){ 
+    this->isSRGB = isSRGB;
+    Init(path);
     if(!instances.empty())
     {
         std::vector<glm::vec3> offsets;
@@ -23,6 +25,7 @@ private:
 std::vector<Mesh>meshes;
 std::string directory;
 std::vector<Texture> loadedTextures;
+bool isSRGB = false; //模型是否以SRGB格式加载
 private:
 inline void Init(const std::string&);
 inline void ProcessNode(const aiScene*, const aiNode*);
@@ -118,7 +121,8 @@ inline std::vector<Texture> Model::GetTexturesFromMaterial(const aiMaterial* mt,
         {
             std::string absolutePath = ComposeDirectoryAndPath(directory, str.C_Str());
             std::println("{},", absolutePath);
-            Texture tex(absolutePath.c_str(), name.c_str());
+            Texture tex;
+            tex = isSRGB && _type == aiTextureType_DIFFUSE ? Texture(absolutePath.c_str(), name.c_str(), false, true) : Texture(absolutePath.c_str(), name.c_str());
             tex.path = str.C_Str();
             textures.push_back(tex);
             loadedTextures.push_back(tex);
