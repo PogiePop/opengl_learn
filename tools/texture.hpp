@@ -85,8 +85,8 @@ std::vector<unsigned char> readFileToMemory(const std::wstring &wpath)
     if (hFile == INVALID_HANDLE_VALUE)
     {
         DWORD errorCode = GetLastError();
-        std::string errorMsg = "无法打开文件" + std::string(wpath.begin(), wpath.end()) + ", 错误码:" + std::to_string(errorCode);
-        throw std::runtime_error(errorMsg);
+        std::wstring errorMsg = L"无法打开文件" + std::wstring(wpath.begin(), wpath.end()) + L", 错误码:" + std::to_wstring(errorCode);
+        throw std::runtime_error(std::to_string(errorCode));
     }
 
     // 获取文件大小

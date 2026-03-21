@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(MSVC)
 add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:/utf-8>")
+add_compile_options(/W0)
 endif()
 
 #若没有glm,自行安装

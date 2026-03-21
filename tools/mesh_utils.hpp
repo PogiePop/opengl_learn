@@ -5,7 +5,7 @@
 
 
 Mesh CreateCubeMesh(float, const std::vector<Texture> &, bool);
-Mesh CreateQuadMesh(float, const std::vector<Texture> &, bool);
+Mesh CreateQuadMesh(float, const std::vector<Texture> &, bool, bool);
 Mesh CreateQuadMeshInstance(float, const std::vector<Texture> &, const std::vector<glm::vec3>&,
                     const std::vector<glm::vec3>&, bool);
 Mesh CreatePointMesh(const std::vector<glm::vec3>& points, 
@@ -76,7 +76,7 @@ Mesh CreateCubeMesh(float size = 1.0f, const std::vector<Texture> &textures = _e
     return Mesh(cubeVertices, cubeIndices, textures, isSubMod);
 }
 
-Mesh CreateQuadMesh(float size = 1.0f, const std::vector<Texture> &textures = _empty, bool isSubMod = false)
+Mesh CreateQuadMesh(float size = 1.0f, const std::vector<Texture> &textures = _empty, bool isSubMod = false, bool isNormalPt = false)
 {
     // 半长：四边形沿X/Y轴的半尺寸，中心在(0,0,0)，平面Z=0
     float halfSize = size / 2.0f;
@@ -99,7 +99,7 @@ Mesh CreateQuadMesh(float size = 1.0f, const std::vector<Texture> &textures = _e
         0, 2, 3};
 
     // 直接返回Mesh对象，复用现有Mesh类的VAO/VBO/EBO初始化逻辑
-    return Mesh(quadVertices, quadIndices, textures, isSubMod);
+    return Mesh(quadVertices, quadIndices, textures, isSubMod, isNormalPt);
 }
 
 Mesh CreateQuadMeshInstance(float size = 1.0f, const std::vector<Texture> &textures = _empty, 

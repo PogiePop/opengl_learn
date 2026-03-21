@@ -9,8 +9,9 @@
 class Model
 {
 public:
-Model(const std::string& path, const std::vector<InstanceData>& instances = _instance_ep, bool isSRGB = false){ 
+Model(const std::string& path, const std::vector<InstanceData>& instances = _instance_ep, bool isSRGB = false, bool isNormaPt = false){
     this->isSRGB = isSRGB;
+    this->isNormaPt = isNormaPt;
     Init(path);
     if(!instances.empty())
     {
@@ -26,6 +27,7 @@ std::vector<Mesh>meshes;
 std::string directory;
 std::vector<Texture> loadedTextures;
 bool isSRGB = false; //模型是否以SRGB格式加载
+bool isNormaPt = false;
 private:
 inline void Init(const std::string&);
 inline void ProcessNode(const aiScene*, const aiNode*);
@@ -38,7 +40,9 @@ inline std::string ComposeDirectoryAndPath(const std::string&, const std::string
 inline void Model::Init(const std::string& path)
 {
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    unsigned int steps = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
+    if (isNormaPt) steps |= aiProcess_CalcTangentSpace;
+    const aiScene* scene = import.ReadFile(path, steps);
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::println("error::info::{}", import.GetErrorString());
@@ -81,6 +85,15 @@ inline Mesh Model::ProcessMesh(const aiScene* scene, const aiMesh* mesh)
             vt.texCoord = glm::vec2(tc.x, tc.y);
             vertices.push_back(vt);
         }
+
+        if (isNormaPt) {
+            vt.tangent.x = mesh->mTangents[i].x;
+            vt.tangent.y = mesh->mTangents[i].y;
+            vt.tangent.z = mesh->mTangents[i].z;
+            vt.bitangent.x = mesh->mBitangents[i].x;
+            vt.bitangent.y = mesh->mBitangents[i].y;
+            vt.bitangent.z = mesh->mBitangents[i].z;
+        }
     }
 
     for(int i = 0; i < (int)mesh->mNumFaces; i++)
@@ -95,10 +108,12 @@ inline Mesh Model::ProcessMesh(const aiScene* scene, const aiMesh* mesh)
         const aiMaterial* mt = scene->mMaterials[mesh->mMaterialIndex];
         std::vector<Texture> diffuseMap = GetTexturesFromMaterial(mt, aiTextureType_DIFFUSE, "diffuse");
         std::vector<Texture> specularMap = GetTexturesFromMaterial(mt, aiTextureType_SPECULAR, "specular");
+        std::vector<Texture> normalMap = GetTexturesFromMaterial(mt, aiTextureType_HEIGHT, "normal");
         textures.insert(textures.end(), diffuseMap.begin(), diffuseMap.end());
         textures.insert(textures.end(), specularMap.begin(), specularMap.end());
+        textures.insert(textures.end(), normalMap.begin(), normalMap.end());
     }
-    return Mesh(vertices, indices, textures);
+    return isNormaPt ? Mesh(vertices, indices, textures, false, true, true) : Mesh(vertices, indices, textures);
 }
 
 

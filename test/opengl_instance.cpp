@@ -190,10 +190,7 @@ int main()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     });
 
-    // ========== 新增：ImGui资源释放 ==========
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+
 
     return 0;
 }

@@ -76,6 +76,18 @@ add_executable(shadow1 opengl_shadow1.cpp)
 add_test(shadow1 shadow1)
 target_link_libraries(shadow1 PUBLIC ${COMMON_LIBS})
 
+add_executable(normalpt opengl_normalpt.cpp)
+add_test(normalpt normalpt)
+target_link_libraries(normalpt PUBLIC ${COMMON_LIBS})
+
+add_executable(disp opengl_disp.cpp)
+add_test(disp disp)
+target_link_libraries(disp PUBLIC ${COMMON_LIBS})
+
+
+add_executable(hdr opengl_hdr.cpp)
+add_test(hdr hdr)
+target_link_libraries(hdr PUBLIC ${COMMON_LIBS})
 
 #将assimp dll复制到执行文件下的目录
 add_custom_command(TARGET model POST_BUILD

@@ -225,9 +225,7 @@ int main()
     // --------------------------
     // 资源清理
     // --------------------------
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+
     glDeleteBuffers(1, &ubo);
 
     return 0;

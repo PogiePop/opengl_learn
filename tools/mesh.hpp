@@ -16,11 +16,16 @@ struct Vertex
     glm::vec2 texCoord;
     glm::vec3 normal;
     glm::vec3 color;//没有纹理时使用
-    Vertex(){}
+
+    glm::vec3 tangent;//主切线
+    glm::vec3 bitangent;//副切线
+    Vertex() = default;
     Vertex(glm::vec3 position, glm::vec2 texCoord, glm::vec3 normal): 
     position(position), texCoord(texCoord), normal(normal){}
     Vertex(glm::vec3 position, glm::vec2 texCoord, glm::vec3 normal, glm::vec3 color): 
     position(position), texCoord(texCoord), normal(normal), color(color){}
+    Vertex(glm::vec3 position, glm::vec2 texCoord, glm::vec3 normal, glm::vec3 color, glm::vec3 tangent, glm::vec3 bitangent):
+    position(position), texCoord(texCoord), normal(normal), color(color), tangent(tangent), bitangent(bitangent) {}
 };
 
 struct InstanceData
@@ -36,10 +41,13 @@ public:
     Mesh(const std::vector<Vertex> &vertices,
         const std::vector<unsigned int> &indices, 
         const std::vector<Texture> &textures,
-        bool isSubMod = false): 
-    vertices(vertices), indices(indices), textures(textures){
+        bool isSubMod = false,
+        bool isNormalPt = false,
+        bool hasNormalPt = false
+        ):
+    vertices(vertices), indices(indices), textures(textures), hasNormalPt(hasNormalPt){
         if(!isSubMod)
-            Init(vertices, indices);
+            Init(vertices, indices, _instance_ep, isNormalPt);
         else
             InitSub(vertices, indices);
         }
@@ -47,13 +55,25 @@ public:
         const std::vector<unsigned int> &indices, 
         const std::vector<Texture> &textures,
         const std::vector<InstanceData>& instances,
-        bool isSubMod = false): 
+        bool isSubMod = false):
     vertices(vertices), indices(indices), textures(textures), instances(instances){
         if(!isSubMod)
             Init(vertices, indices, instances);
         else
             InitSub(vertices, indices);
         }
+
+    // Mesh(const std::vector<Vertex> &vertices,
+    //     const std::vector<unsigned int> &indices,
+    //     const std::vector<Texture> &textures,
+    //     bool isNormalPt,
+    //     bool isSubMod = false):
+    // vertices(vertices), indices(indices), textures(textures){
+    //     if(!isSubMod)
+    //         Init(vertices, indices, _instance_ep, isNormalPt);
+    //     else
+    //         InitSub(vertices, indices);
+    // }
     inline void Draw(Shader &);
     inline void DrawCubeMap(Shader &);
     inline void DrawPoint(float);
@@ -71,22 +91,25 @@ private:
     std::vector<Texture> textures;
     std::vector<InstanceData> instances; //实例化数据池
     unsigned int vao, vbo, ebo, instanceVbo = 0;
+    bool hasNormalPt = false;
 private:
-    inline void Init(const std::vector<Vertex> &, const std::vector<unsigned int> &, const std::vector<InstanceData>&instances = _instance_ep);
+    inline void Init(const std::vector<Vertex> &, const std::vector<unsigned int> &, const std::vector<InstanceData>&instances = _instance_ep, bool isNormalPt = false);
     inline void InitSub(const std::vector<Vertex>&, const std::vector<unsigned int>&);
+    inline void ComputeTBN();
 };
 
-inline void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, const std::vector<InstanceData>&instances)
+inline void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, const std::vector<InstanceData>&instances, bool isNormalPt)
 {
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, (int)vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+    if (isNormalPt && !hasNormalPt) ComputeTBN();
+    glBufferData(GL_ARRAY_BUFFER, (int)this->vertices.size() * sizeof(Vertex), this->vertices.data(), GL_STATIC_DRAW);
     if(!indices.empty()){
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)this->indices.size() * sizeof(unsigned int), this->indices.data(), GL_STATIC_DRAW);
     }
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -106,6 +129,14 @@ inline void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<un
         glEnableVertexAttribArray(4);
         glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (void*)0);
         glVertexAttribDivisor(4, 1);
+    }
+
+    if (isNormalPt) {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 3,GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
     }
     glBindVertexArray(0);
 }
@@ -143,7 +174,7 @@ inline void Mesh::InitSub(const std::vector<Vertex>& vertices, const std::vector
 
 inline void Mesh::Draw(Shader &sd)
 {
-    int diffNum = 0, specNum = 0, other = 0;
+    int diffNum = 0, specNum = 0, normal = 0, depth = 0, other = 0;
     for(int i = 0; i < (int)textures.size(); i++)
     {
         std::string name = "";
@@ -154,6 +185,12 @@ inline void Mesh::Draw(Shader &sd)
         else if(textures[i].type == "specular")
         {
             name += "material.specular" + std::to_string(specNum++);
+        }
+        else if (textures[i].type == "normal") {
+            name += "material.normal" + std::to_string(normal++);
+        }
+        else if (textures[i].type == "depth") {
+            name += "material.depth" + std::to_string(depth++);
         }
         else
         {
@@ -253,6 +290,46 @@ void Mesh::ModifyOffset(const std::vector<glm::vec3>& offsets)
         glBufferData(GL_ARRAY_BUFFER, sizeof(InstanceData) * instances.size(), instances.data(), GL_STATIC_DRAW);
     }
     glBindVertexArray(0);
+}
+
+
+inline void Mesh::ComputeTBN() {
+    std::vector<glm::vec3> tangents(vertices.size(), glm::vec3(0.0f)), bitangents(vertices.size(), glm::vec3(0.0f));
+    for (size_t i = 0; i < indices.size(); i+=3) {
+        glm::vec3 tangent, bitangent;
+        unsigned int ix1 = indices[i];
+        unsigned int ix2 = indices[i+1];
+        unsigned int ix3 = indices[i+2];
+        glm::vec3 pos1 = vertices[ix1].position;
+        glm::vec3 pos2 = vertices[ix2].position;
+        glm::vec3 pos3 = vertices[ix3].position;
+        glm::vec2 uv1 = vertices[ix1].texCoord;
+        glm::vec2 uv2 = vertices[ix2].texCoord;
+        glm::vec2 uv3 = vertices[ix3].texCoord;
+        glm::vec2 deltaUV12 = uv2 - uv1;
+        glm::vec2 deltaUV13 = uv3 - uv1;
+        glm::vec3 edge1 = pos2 - pos1;
+        glm::vec3 edge2 = pos3 - pos1;
+        float k = 1.0f / (deltaUV12.x * deltaUV13.y - deltaUV13.x * deltaUV12.y);
+        tangent.x = k * (deltaUV13.y * edge1.x - deltaUV12.y * edge2.x);
+        tangent.y = k * (deltaUV13.y * edge1.y - deltaUV12.y * edge2.y);
+        tangent.z = k * (deltaUV13.y * edge1.z - deltaUV12.y * edge2.z);
+        bitangent.x = k * (-deltaUV13.x * edge1.x + deltaUV12.x * edge2.x);
+        bitangent.y = k * (-deltaUV13.x * edge1.y + deltaUV12.x * edge2.y);
+        bitangent.z = k * (-deltaUV13.x * edge1.z + deltaUV12.x * edge2.z);
+        tangents[ix1] += tangent;
+        tangents[ix2] += tangent;
+        tangents[ix3] += tangent;
+        bitangents[ix1] += bitangent;
+        bitangents[ix2] += bitangent;
+        bitangents[ix3] += bitangent;
+    }
+
+    for (size_t i = 0; i < vertices.size(); i++) {
+        glm::vec3 T =glm::normalize(tangents[i] - vertices[i].normal * glm::dot(vertices[i].normal, tangents[i]));
+        vertices[i].tangent = T;
+        vertices[i].bitangent = glm::normalize(glm::cross(vertices[i].normal, T));
+    }
 }
 
 #endif
