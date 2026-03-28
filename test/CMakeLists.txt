@@ -89,6 +89,11 @@ add_executable(hdr opengl_hdr.cpp)
 add_test(hdr hdr)
 target_link_libraries(hdr PUBLIC ${COMMON_LIBS})
 
+
+add_executable(bloom opengl_bloom.cpp)
+add_test(bloom bloom)
+target_link_libraries(bloom PUBLIC ${COMMON_LIBS})
+
 #将assimp dll复制到执行文件下的目录
 add_custom_command(TARGET model POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

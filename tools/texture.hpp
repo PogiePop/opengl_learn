@@ -18,7 +18,7 @@ public:
         this->type = type;
     }
     Texture(const std::vector<std::string> &faces) { LoadCubeMap(faces); }
-    void Bind() { glBindTexture(GL_TEXTURE_2D, ID); }
+    void Bind()const { glBindTexture(GL_TEXTURE_2D, ID); }
     void BindCubeMap() { glBindTexture(GL_TEXTURE_CUBE_MAP, ID); }
     unsigned int GetID() { return ID; }
 

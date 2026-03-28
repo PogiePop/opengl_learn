@@ -43,6 +43,8 @@ vec3 CalculatePointLight(Material mtr, PointLight pl)
 {
     vec3 viewDir = normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
     vec2 texCoords = ParallaxMapping(fs_in.TexCoord, viewDir);
+    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+    discard;
     // 1. 法线贴图转换（切线空间→世界空间）
     vec3 normal = texture(mtr.normal0, texCoords).rgb;
     normal = normalize(normal * 2.0 - 1.0); // [0,1] → [-1,1]

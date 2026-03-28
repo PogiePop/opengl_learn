@@ -74,11 +74,11 @@ public:
     //     else
     //         InitSub(vertices, indices);
     // }
-    inline void Draw(Shader &);
+    inline void Draw(const Shader &)const;
     inline void DrawCubeMap(Shader &);
     inline void DrawPoint(float);
     inline void DrawInstance(Shader&, int);
-    void Bind(){ glBindVertexArray(vao); }
+    void Bind()const{ glBindVertexArray(vao); }
     void AddTexture(const std::vector<Texture>& textures){ this->textures.insert(this->textures.end(), textures.begin(), textures.end()); }    
     void AddTexture(const Texture& tex){ this->textures.push_back(tex); }
     void ModifyColor(const std::vector<glm::vec3>&);
@@ -172,7 +172,7 @@ inline void Mesh::InitSub(const std::vector<Vertex>& vertices, const std::vector
     glBindVertexArray(0);
 }
 
-inline void Mesh::Draw(Shader &sd)
+inline void Mesh::Draw(const Shader &sd)const
 {
     int diffNum = 0, specNum = 0, normal = 0, depth = 0, other = 0;
     for(int i = 0; i < (int)textures.size(); i++)

@@ -12,12 +12,12 @@ class Shader
 public:
     Shader() = default;
     Shader(const char *vertexShader, const char *geometryShader = nullptr, const char *fragmentShader = nullptr);
-    void use() { glUseProgram(ID); }
-    inline void SetMat4(const std::string &, const glm::mat4 &);
-    inline void SetVec3(const std::string &, const glm::vec3 &);
-    inline void SetFloat1(const std::string &, const float &);
-    inline void SetInt1(const std::string &, const int &);
-    inline void BindBlock(const std::string&, const int&);
+    void use()const { glUseProgram(ID); }
+    inline void SetMat4(const std::string &, const glm::mat4 &)const;
+    inline void SetVec3(const std::string &, const glm::vec3 &)const;
+    inline void SetFloat1(const std::string &, const float &)const;
+    inline void SetInt1(const std::string &, const int &)const;
+    inline void BindBlock(const std::string&, const int&)const;
 private:
     unsigned int ID;
 };
@@ -132,28 +132,28 @@ Shader::Shader(const char *vertexShader, const char *geometryShader, const char 
         glDeleteShader(f_sd);
 }
 
-inline void Shader::SetMat4(const std::string &name, const glm::mat4 &value)
+inline void Shader::SetMat4(const std::string &name, const glm::mat4 &value)const
 {
     int location = glGetUniformLocation(ID, name.c_str());
     if(location != -1)glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
-inline void Shader::SetVec3(const std::string &name, const glm::vec3 &value)
+inline void Shader::SetVec3(const std::string &name, const glm::vec3 &value)const
 {
     int location = glGetUniformLocation(ID, name.c_str());
     if(location != -1)glUniform3fv(location, 1, glm::value_ptr(value));
 }
-inline void Shader::SetFloat1(const std::string &name, const float &value)
+inline void Shader::SetFloat1(const std::string &name, const float &value)const
 {
     int location = glGetUniformLocation(ID, name.c_str());
     if(location != -1)glUniform1f(location, value);
 }
-inline void Shader::SetInt1(const std::string &name, const int &value)
+inline void Shader::SetInt1(const std::string &name, const int &value)const
 {
     int location = glGetUniformLocation(ID, name.c_str());
     if(location != -1)glUniform1i(location, value);
 }
 
-inline void Shader::BindBlock(const std::string& name, const int& bknum)
+inline void Shader::BindBlock(const std::string& name, const int& bknum)const
 {
     int location = glGetUniformBlockIndex(ID, name.c_str());
     if(location != -1)glUniformBlockBinding(ID, location, bknum);
