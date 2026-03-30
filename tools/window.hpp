@@ -45,6 +45,7 @@ public:
     inline void SetEventProxy();
     int GetWidth() { return m_Width; }
     int GetHeight() { return m_Height; }
+    float GetAspect() const { return (float)m_Width / (float) m_Height; }
 
 private:
     inline void Init(int width, int height, const std::string &title);
@@ -124,7 +125,7 @@ inline void Window::Init(int width, int height, const std::string &title)
         TTF_PATH "FZSTK.TTF",
         font_size,
         &font_config,
-        io.Fonts->GetGlyphRangesChineseFull() // 加载完整字形
+        io.Fonts->GetGlyphRangesDefault() // 加载完整字形
     );
 
 

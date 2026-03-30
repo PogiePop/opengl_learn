@@ -1,7 +1,8 @@
 {
-    "editor.fontFamily": "'Consolas', 'FZSTK', monospace",
-    "terminal.integrated.fontFamily": "'Consolas', 'FZSTK', monospace",
-    "debug.console.fontFamily": "'Consolas', 'FZSTK', monospace",
+    "editor.fontFamily": "JetBrains Mono",
+    "terminal.integrated.fontFamily": "JetBrains Mono",
+    "editor.fontSize": 16,
+    "debug.console.fontFamily": "default",
     "terminal.integrated.profiles.windows": {
         "PowerShell": {
             "source": "PowerShell",
