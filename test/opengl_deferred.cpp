@@ -97,7 +97,7 @@ int main()
 
     // pass1
     Shader pass1(RES_PATH "shaders/deferred/1.vert", nullptr, RES_PATH "shaders/deferred/1.frag");
-    Model liuyin(RES_PATH "textures/models/liuyin/琉音.pmx");
+    Model liuyin(RES_PATH "textures/models/lamier/Default/lamier.fbx");
     // pass2(光照处理)
     Shader pass2(RES_PATH "shaders/deferred/2.vert", nullptr, RES_PATH "shaders/deferred/2.frag");
     Mesh scene = CreateQuadMesh(2.0f);
@@ -123,7 +123,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(4.0f));
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), _window.GetAspect(), 0.1f, 100.0f);
         //非光照处理阶段
@@ -157,6 +158,7 @@ int main()
         glBlitFramebuffer(0, 0, _window.GetWidth(), _window.GetHeight(), 0, 0, _window.GetWidth(), _window.GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         blend.use();
+        model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.5f, 0.1f, -2.1f));
         blend.SetMat4("model", model);
         blend.SetMat4("view", view);

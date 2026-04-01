@@ -98,6 +98,10 @@ add_executable(deferred opengl_deferred.cpp)
 add_test(deferred deferred)
 target_link_libraries(deferred PUBLIC ${COMMON_LIBS})
 
+add_executable(ssao opengl_ssao.cpp)
+add_test(ssao ssao)
+target_link_libraries(ssao PUBLIC ${COMMON_LIBS})
+
 #将assimp dll复制到执行文件下的目录
 add_custom_command(TARGET model POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
